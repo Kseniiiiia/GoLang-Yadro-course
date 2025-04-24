@@ -30,23 +30,30 @@
 - `POST /api/login` - аутентификация (JWT)
 
 
-## Запуск
+## Запуск и сборка
 1. Клонируем репозиторий
 ```bash
 git clone https://github.com/Kseniiiiia/GoLang-Yadro-course.git
 ```
-2. Запускаем ${container_runtime} compose up --build -d
+
+
+2. Переходим в папку
+   ```
+   cd ./GoLang-Yadro-course
+   ```
+   
+3. Запускаем
 ```bash
 make up
 ```
 
-3. Переходим по http://localhost:28084 и попадаем на основную страничку поискового сервиса
+4. Переходим по http://localhost:28084 и попадаем на основную страничку поискового сервиса
 
 
-4. Для загрузки комиксов переходим в Admin Panel, вводим `username:admin`, `password:password`
+5. Для загрузки комиксов переходим в Admin Panel, вводим `username:admin`, `password:password`
 
 
-5. Нажимаем на кнопку Update DB и ждем примерно 30-40 секунд
+6. Нажимаем на кнопку Update DB и ждем примерно 30-40 секунд
 
 
-6. Теперь можно переходить к поиску комиксов
+7. Теперь можно переходить к поиску комиксов
