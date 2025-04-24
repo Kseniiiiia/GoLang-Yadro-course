@@ -38,9 +38,9 @@ git clone https://github.com/Kseniiiiia/GoLang-Yadro-course.git
 
 
 2. Переходим в папку
-   ```
-   cd ./GoLang-Yadro-course
-   ```
+```
+cd ./GoLang-Yadro-course
+```
    
 3. Запускаем
 ```bash
