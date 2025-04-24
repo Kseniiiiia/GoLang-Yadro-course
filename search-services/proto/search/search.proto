@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package search;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "search-services/proto/search";
+
+service Search {
+  rpc Search(SearchRequest) returns (SearchResponse);
+  rpc IndexSearch(IndexSearchRequest) returns (SearchResponse);
+  rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+message IndexSearchRequest {
+  string phrase = 1;
+  int32 limit = 2;
+}
+
+message SearchRequest {
+  string phrase = 1;
+  int32 limit = 2;
+}
+
+message SearchResponse {
+  repeated Comic comics = 1;
+  int32 total = 2;
+}
+
+message Comic {
+  int32 id = 1;
+  string url = 2;
+}

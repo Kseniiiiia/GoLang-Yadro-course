@@ -1,0 +1,6 @@
+log_level: DEBUG
+server:
+  address: localhost:28084
+  timeout: 2m
+api:
+  url: http://localhost:28080

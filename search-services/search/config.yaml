@@ -1,0 +1,7 @@
+log_level: DEBUG
+words_address: localhost:28081
+db_address: localhost:5432
+search_server:
+    address: localhost:28083
+    timeout: 10s
+    index_ttl: 20s

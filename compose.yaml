@@ -1,0 +1,180 @@
+services:
+
+  frontend:
+    image: frontend:latest
+    build:
+      context: search-services
+      dockerfile: search-services/Dockerfile.frontend
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - 28084:8080
+    volumes:
+      - ./search-services/comic-frontend/templates/admin.html:/templates/admin.html
+      - ./search-services/comic-frontend/templates/index.html:/templates/index.html
+      - ./search-services/comic-frontend/templates/login.html:/templates/login.html
+      - ./search-services/comic-frontend/templates/results.html:/templates/results.html
+      - ./search-services/comic-frontend/templates/image_search.html:/templates/image_search.html
+      - ./search-services/comic-frontend/config.yaml:/config.yaml
+    environment:
+      - SERVER_ADDRESS=:8080
+      - API_BASE_URL=http://api:8080
+    depends_on:
+      - api
+
+  yolo:
+    image: yolo:latest
+    build:
+      context: search-services
+      dockerfile: search-services/Dockerfile.yolo
+    container_name: yolo
+    restart: unless-stopped
+    ports:
+      - 28085:8080
+    volumes:
+      - ./search-services/yolo/config.yaml:/config.yaml
+    environment:
+      - YOLO_ADDRESS=:8080
+      - YOLO_API_ADDRESS=http://yoloapi:10004
+    depends_on:
+      - yoloapi
+
+
+  api:
+    image: api:latest
+    build:
+      context: search-services
+      dockerfile: search-services/Dockerfile.api
+    container_name: api
+    restart: unless-stopped
+    ports:
+      - 28080:8080
+    volumes:
+      - ./search-services/api/config.yaml:/config.yaml
+    environment:
+      - ADMIN_USER=admin
+      - ADMIN_PASSWORD=password
+      - TOKEN_TTL=2m
+      - API_ADDRESS=:8080
+      - WORDS_ADDRESS=words:8080
+      - UPDATE_ADDRESS=update:8080
+      - SEARCH_ADDRESS=search:8080
+      - YOLO_ADDRESS=yolo:8080
+      - SEARCH_CONCURRENCY=10
+      - SEARCH_RATE=100
+    depends_on:
+      - words
+      - update
+      - search
+      - yolo
+
+  words:
+    image: words:latest
+    build:
+      context: search-services
+      dockerfile: search-services/Dockerfile.words
+    container_name: words
+    restart: unless-stopped
+    ports:
+      - 28081:8080
+    volumes:
+      - ./search-services/words/config.yaml:/config.yaml
+    environment:
+      - WORDS_ADDRESS=:8080
+
+  update:
+    image: update:latest
+    build:
+      context: search-services
+      dockerfile: search-services/Dockerfile.update
+    container_name: update
+    restart: unless-stopped
+    ports:
+      - 28082:8080
+    volumes:
+      - ./search-services/update/config.yaml:/config.yaml
+    environment:
+      - UPDATE_ADDRESS=:8080
+      - DB_ADDRESS=postgres://postgres:password@postgres:5432/postgres
+      - XKCD_URL=https://xkcd.com
+      - XKCD_CONCURRENCY=10
+      - WORDS_ADDRESS=words:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      words:
+        condition: service_started
+
+  search:
+    image: search:latest
+    build:
+      context: search-services
+      dockerfile: search-services/Dockerfile.search
+    container_name: search
+    restart: unless-stopped
+    ports:
+      - 28083:8080
+    volumes:
+      - ./search-services/search/config.yaml:/config.yaml
+    environment:
+      - SEARCH_ADDRESS=:8080
+      - DB_ADDRESS=postgres://postgres:password@postgres:5432/postgres
+      - WORDS_ADDRESS=words:8080
+      - INDEX_TTL=20s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  tests:
+    image: tests:latest
+    build: tests
+    container_name: tests
+    restart: "no"
+    entrypoint: "true"
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "runuser", "-u", "postgres", "--", "pg_isready" ]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    restart: unless-stopped
+    ports:
+      - "18888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@test.com
+      PGADMIN_DEFAULT_PASSWORD: password
+      PGADMIN_DISABLE_POSTFIX: "true"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+
+  yoloapi:
+    image: tae898/yolov5
+    container_name: yoloapi
+    ports:
+      - "10004:10004"
+    restart: unless-stopped
+
+
+volumes:
+  postgres:
+  pgadmin:

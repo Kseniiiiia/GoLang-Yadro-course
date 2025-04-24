@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Comics by Image</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: #4a6fa5;
+            margin-bottom: 10px;
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-area:hover {
+            border-color: #4a6fa5;
+            background: #f8fafc;
+        }
+        #preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px auto;
+            display: none;
+            border-radius: 4px;
+        }
+        .button {
+            display: inline-flex;
+            align-items: center;
+            padding: 14px 28px;
+            background: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(74, 111, 165, 0.2);
+        }
+        .button:hover {
+            background: #3a5a8f;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(74, 111, 165, 0.3);
+        }
+        .button svg {
+            margin-right: 8px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .file-name {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .instructions {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Search Comics by Image</h1>
+
+    <form id="imageSearchForm" enctype="multipart/form-data">
+        <div class="upload-area" id="uploadArea">
+            <input type="file" id="imageInput" accept="image/*" style="display: none;">
+            <p>Click to upload image</p>
+            <p class="instructions">Supported formats: JPG</p>
+            <img id="preview">
+            <div id="fileName" class="file-name"></div>
+        </div>
+
+        <div style="text-align: center;">
+            <button type="submit" class="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                Search Comics
+            </button>
+        </div>
+    </form>
+
+    <div class="loading" id="loadingIndicator">
+        <p>Analyzing image and searching comics...</p>
+    </div>
+
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="/" class="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Back to Text Search
+        </a>
+    </div>
+</div>
+
+<script>
+    const uploadArea = document.getElementById('uploadArea');
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const fileName = document.getElementById('fileName');
+    const form = document.getElementById('imageSearchForm');
+    const loading = document.getElementById('loadingIndicator');
+
+    // Handle click on upload area
+    uploadArea.addEventListener('click', () => {
+        imageInput.click();
+    });
+
+    // Handle file selection
+    imageInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            updatePreview(e.target.files[0]);
+        }
+    });
+
+    // Handle drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#4a6fa5';
+        uploadArea.style.backgroundColor = '#f0f4f8';
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.borderColor = '#ddd';
+        uploadArea.style.backgroundColor = '';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.borderColor = '#ddd';
+        uploadArea.style.backgroundColor = '';
+
+        if (e.dataTransfer.files.length) {
+            imageInput.files = e.dataTransfer.files;
+            updatePreview(e.dataTransfer.files[0]);
+        }
+    });
+
+    // Update preview and file name
+    function updatePreview(file) {
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            preview.src = event.target.result;
+            preview.style.display = 'block';
+            fileName.textContent = file.name;
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const file = imageInput.files[0];
+        if (!file) {
+            alert('Please select an image first');
+            return;
+        }
+
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        const fileType = file.type.toLowerCase();
+
+        if (!validTypes.includes(fileType)) {
+            alert('Please upload a valid image file (JPEG, PNG or GIF)');
+            return;
+        }
+
+        // Validate file extension
+        const validExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+        const fileName = file.name.toLowerCase();
+        const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+
+        if (!hasValidExtension) {
+            alert('Please upload a file with valid extension (.jpg, .jpeg, .png or .gif)');
+            return;
+        }
+
+        loading.style.display = 'block';
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await fetch('/detect', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(error || 'Failed to process image');
+            }
+
+            // Get HTML response
+            const html = await response.text();
+
+            // Replace current page with new one
+            document.open();
+            document.write(html);
+            document.close();
+
+        } catch (error) {
+            alert('Error: ' + error.message);
+            console.error('Error:', error);
+        } finally {
+            loading.style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>

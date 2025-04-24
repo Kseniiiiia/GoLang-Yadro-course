@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package yolo;
+
+option go_package = "yadro.com/course/proto/yolo";
+
+service YoloService {
+  rpc Detect (DetectRequest) returns (DetectResponse);
+}
+
+message DetectRequest {
+  bytes image_data = 1;
+}
+
+message DetectResponse {
+  repeated Detection results = 1;
+}
+
+message Detection {
+  repeated float bboxes = 1;
+  float confidence = 2;
+  string label = 3;
+  int32 label_num = 4;
+}

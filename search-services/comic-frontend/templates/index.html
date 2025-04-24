@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comic Search</title>
+  <style>
+    :root {
+      --primary-color: #4a6fa5;
+      --danger-color: #e74c3c;
+      --success-color: #2ecc71;
+      --warning-color: #f39c12;
+      --light-gray: #f5f5f5;
+      --border-color: #ddd;
+      --toggle-size: 24px;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background-color: #f9f9f9;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .header-links {
+      display: flex;
+      gap: 15px;
+    }
+
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+
+    .search-form {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin: 20px 0;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    input[type="text"], input[type="number"] {
+      padding: 12px 15px;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+    }
+
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      margin: 30px 0;
+      padding: 15px;
+      background-color: #f8fafc;
+      border-radius: 8px;
+      transition: background-color 0.3s;
+    }
+
+    .toggle-wrapper:hover {
+      background-color: #f1f5f9;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: var(--toggle-size);
+      flex-shrink: 0;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #e2e8f0;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: calc(var(--toggle-size) - 8px);
+      width: calc(var(--toggle-size) - 8px);
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    input:checked + .toggle-slider {
+      background-color: var(--primary-color);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(28px);
+    }
+
+    .toggle-label {
+      margin-left: 15px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #334155;
+      cursor: pointer;
+      flex-grow: 1;
+    }
+
+    .toggle-hint {
+      display: block;
+      margin-top: 5px;
+      font-size: 14px;
+      color: #64748b;
+      font-weight: normal;
+    }
+
+    button {
+      padding: 14px 28px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(74, 111, 165, 0.2);
+    }
+
+    button:hover {
+      background-color: #3a5a8f;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(74, 111, 165, 0.3);
+    }
+
+    .admin-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 16px;
+      background-color: white;
+      color: #334155;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s;
+      border: 1px solid var(--border-color);
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .admin-link:hover {
+      background-color: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .admin-link::after {
+      content: "→";
+      margin-left: 8px;
+      transition: transform 0.3s;
+    }
+
+    .admin-link:hover::after {
+      transform: translateX(3px);
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Comic Search</h1>
+    <div class="header-links">
+      <a href="/image-search" class="admin-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <circle cx="8.5" cy="8.5" r="1.5"></circle>
+          <polyline points="21 15 16 10 5 21"></polyline>
+        </svg>
+        Search by Image
+      </a>
+      <a href="/admin" class="admin-link">Admin Panel</a>
+    </div>
+  </div>
+
+  <form class="search-form" action="/search" method="get">
+    <div class="form-group">
+      <label for="phrase">Search phrase</label>
+      <input type="text" id="phrase" name="phrase" placeholder=" " required>
+    </div>
+
+    <div class="form-group">
+      <label for="limit">Results limit (optional)</label>
+      <input type="number" id="limit" name="limit" min="1" max="100" placeholder=" ">
+    </div>
+
+    <div class="toggle-wrapper">
+      <label class="toggle-switch">
+        <input type="checkbox" name="fast" value="true">
+        <span class="toggle-slider"></span>
+      </label>
+      <span class="toggle-label">
+        Fast search mode
+        <span class="toggle-hint">Uses pre-built index for faster results</span>
+      </span>
+    </div>
+
+    <button type="submit">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: middle;">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      Search Comics
+    </button>
+  </form>
+</div>
+</body>
+</html>
