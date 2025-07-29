@@ -23,7 +23,7 @@ type DB interface {
 type XKCD interface {
 	Get(context.Context, int) (XKCDInfo, error)
 	LastID(context.Context) (int, error)
-	MissingIds(context.Context) []int
+	MissingIds(context.Context) map[int]bool
 }
 
 type Words interface {

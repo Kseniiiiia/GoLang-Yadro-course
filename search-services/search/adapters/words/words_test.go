@@ -58,7 +58,7 @@ func TestClient_Norm(t *testing.T) {
 				mockClient.EXPECT().Norm(
 					gomock.Any(),
 					&wordspb.WordsRequest{Phrase: "error"},
-				).Return(nil, status.Error(codes.Internal, "internal error"))
+				).Return(nil, status.Error(codes.Internal, "adapters error"))
 			},
 			phrase:       "error",
 			expectedErr:  errors.New("failed to normalize words"),

@@ -38,6 +38,8 @@ func main() {
 	mux.HandleFunc("POST /admin/update", handler.AdminUpdate)
 	mux.HandleFunc("POST /admin/drop", handler.AdminDrop)
 
+	mux.HandleFunc("GET /admin/update/update-progress", handler.HandleUpdateProgress)
+
 	srv := &http.Server{
 		Addr:    cfg.Server.Address,
 		Handler: mux,

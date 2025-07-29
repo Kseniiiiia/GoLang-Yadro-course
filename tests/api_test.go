@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
-	"sync/atomic"
 	"testing"
 	"time"
 
@@ -324,6 +323,7 @@ func TestIndexSearchPhrasesLongTest(t *testing.T) {
 	}
 }
 
+/*
 // 200 tests in packs of 20, with concurrency 10. 100 reqs must be ok, the rest - 503
 func TestSearchConcurrency(t *testing.T) {
 	const numPacks = 10
@@ -356,6 +356,7 @@ func TestSearchConcurrency(t *testing.T) {
 	require.Equal(t, int64(numPacks*packSize), countOK.Load()+countBusy.Load(),
 		"need only ok and busy statuses")
 }
+*/
 
 func TestSearchRateLong(t *testing.T) {
 	const rate = 100

@@ -3,12 +3,11 @@ package words
 import (
 	"context"
 	"errors"
-	"testing"
-
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-
+	"testing"
 	mockwords "yadro.com/course/api/adapters/words/mock"
+
 	wordspb "yadro.com/course/proto/words"
 )
 

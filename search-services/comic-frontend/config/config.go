@@ -1,10 +1,9 @@
 package config
 
 import (
+	"github.com/ilyakaznacheev/cleanenv"
 	"log"
 	"time"
-
-	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Server struct {
@@ -16,10 +15,15 @@ type API struct {
 	ApiURL string `yaml:"url" env:"API_BASE_URL" env-default:"localhost:28080"`
 }
 
+type WS struct {
+	WsURL string `yaml:"url" env:"WS_BASE_URL" env-default:"localhost:28086"`
+}
+
 type Config struct {
 	LogLevel string `yaml:"log_level" env:"LOG_LEVEL" env-default:"INFO"`
 	Server   Server `yaml:"server"`
 	API      API    `yaml:"api"`
+	WS       WS     `yaml:"ws"`
 }
 
 func MustLoad(configPath string) Config {

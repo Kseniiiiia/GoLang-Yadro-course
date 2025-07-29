@@ -146,5 +146,6 @@ func (s *Service) Count(ctx context.Context) (int, error) {
 	}
 
 	missingIDs := s.xkcd.MissingIds(ctx)
-	return lastID - len(missingIDs), nil
+	comicsTotal := lastID - len(missingIDs)
+	return comicsTotal, nil
 }

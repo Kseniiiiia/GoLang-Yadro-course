@@ -16,7 +16,7 @@ type Client struct {
 	log        *slog.Logger
 	client     http.Client
 	url        string
-	missingIDs []int
+	missingIDs (map[int]bool)
 	mu         sync.Mutex
 }
 
@@ -41,7 +41,8 @@ func (c *Client) Get(ctx context.Context, id int) (core.XKCDInfo, error) {
 
 	if resp.StatusCode == http.StatusNotFound {
 		c.mu.Lock()
-		c.missingIDs = append(c.missingIDs, id)
+		c.missingIDs = make(map[int]bool)
+		c.missingIDs[id] = true
 		c.mu.Unlock()
 		return core.XKCDInfo{}, core.ErrNotFound
 	}
@@ -87,16 +88,6 @@ func (c *Client) LastID(ctx context.Context) (int, error) {
 	return info.NUM, nil
 }
 
-func (c *Client) MissingIds(ctx context.Context) []int {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	if c.missingIDs == nil {
-		return []int{}
-	}
-
-	missingIDsCopy := make([]int, len(c.missingIDs))
-	copy(missingIDsCopy, c.missingIDs)
-
-	return missingIDsCopy
+func (c *Client) MissingIds(ctx context.Context) map[int]bool {
+	return c.missingIDs
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"html/template"
 	"io"
 	"log/slog"
@@ -287,13 +288,11 @@ func (h *Handler) Admin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Success string
-		Status  UpdateStatus
-		Stats   UpdateStats
+		Status UpdateStatus
+		Stats  UpdateStats
 	}{
-		Success: r.URL.Query().Get("success"),
-		Status:  status,
-		Stats:   stats,
+		Status: status,
+		Stats:  stats,
 	}
 
 	if err := h.templates.ExecuteTemplate(w, "admin.html", data); err != nil {
@@ -453,7 +452,7 @@ func (h *Handler) AdminUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/admin?success=update", http.StatusSeeOther)
+	http.Redirect(w, r, "/admin?success=update", http.StatusFound)
 }
 
 func (h *Handler) AdminDrop(w http.ResponseWriter, r *http.Request) {
@@ -487,4 +486,68 @@ func (h *Handler) AdminDrop(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/admin?success=drop", http.StatusSeeOther)
+}
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+type ProgressMessage struct {
+	Type    string      `json:"type"`
+	Payload interface{} `json:"payload"`
+}
+
+func (h *Handler) HandleUpdateProgress(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		h.log.Error("WebSocket upgrade failed", "error", err)
+		return
+	}
+
+	token, err := r.Cookie("admin_token")
+	if err != nil {
+		conn.WriteJSON(map[string]string{"error": "auth required"})
+		return
+	}
+
+	ticker := time.NewTicker(1 * time.Second)
+
+	go func() {
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				stats, err := h.getStats(token.Value)
+				if err != nil {
+					h.log.Error("Failed to get stats", "error", err)
+					return
+				}
+
+				status, err := h.getStatus(token.Value)
+				if err != nil {
+					h.log.Error("Failed to get status", "error", err)
+					return
+				}
+
+				err = conn.WriteJSON(map[string]interface{}{
+					"stats":  stats,
+					"status": status,
+				})
+
+				if err != nil {
+					h.log.Error("WebSocket write error", "error", err)
+					return
+				}
+				h.log.Info("Update progress", "type", stats)
+
+				if stats.ComicsTotal == stats.ComicsFetched {
+					return
+				}
+			}
+		}
+	}()
 }

@@ -2,12 +2,11 @@ package yolo
 
 import (
 	"context"
-	"log/slog"
-
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
+	"log/slog"
 	"yadro.com/course/api/core"
+
 	yolopb "yadro.com/course/proto/yolo"
 )
 

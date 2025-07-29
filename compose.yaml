@@ -4,7 +4,7 @@ services:
     image: frontend:latest
     build:
       context: search-services
-      dockerfile: search-services/Dockerfile.frontend
+      dockerfile: Dockerfile.frontend
     container_name: frontend
     restart: unless-stopped
     ports:
@@ -19,6 +19,7 @@ services:
     environment:
       - SERVER_ADDRESS=:8080
       - API_BASE_URL=http://api:8080
+      - WS_BASE_URL=http://ws:8081
     depends_on:
       - api
 
@@ -26,7 +27,7 @@ services:
     image: yolo:latest
     build:
       context: search-services
-      dockerfile: search-services/Dockerfile.yolo
+      dockerfile: Dockerfile.yolo
     container_name: yolo
     restart: unless-stopped
     ports:
@@ -44,7 +45,7 @@ services:
     image: api:latest
     build:
       context: search-services
-      dockerfile: search-services/Dockerfile.api
+      dockerfile: Dockerfile.api
     container_name: api
     restart: unless-stopped
     ports:
@@ -72,7 +73,7 @@ services:
     image: words:latest
     build:
       context: search-services
-      dockerfile: search-services/Dockerfile.words
+      dockerfile: Dockerfile.words
     container_name: words
     restart: unless-stopped
     ports:
@@ -86,7 +87,7 @@ services:
     image: update:latest
     build:
       context: search-services
-      dockerfile: search-services/Dockerfile.update
+      dockerfile: Dockerfile.update
     container_name: update
     restart: unless-stopped
     ports:
@@ -109,7 +110,7 @@ services:
     image: search:latest
     build:
       context: search-services
-      dockerfile: search-services/Dockerfile.search
+      dockerfile: Dockerfile.search
     container_name: search
     restart: unless-stopped
     ports:
@@ -135,6 +136,7 @@ services:
   postgres:
     image: postgres
     container_name: postgres
+    platform: linux/amd64
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -169,6 +171,7 @@ services:
 
   yoloapi:
     image: tae898/yolov5
+    platform: linux/amd64
     container_name: yoloapi
     ports:
       - "10004:10004"
