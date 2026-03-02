@@ -8,13 +8,6 @@
 
 ---
 
-##  Демонстрация работы
-
-<video src="https://raw.githubusercontent.com/Kseniiiiia/GoLang-Yadro-course/main/animation.mp4" controls width="800"></video>
-*Краткое видео, показывающее поиск комиксов с помощью загруженного изображения*
-
----
-
 ##  Архитектура
 
 Система состоит из шести микросервисов, взаимодействующих через gRPC и REST. Все сервисы находятся в папке search-services/ и контейнеризированы через Docker Compose
@@ -383,7 +376,7 @@ make test
 │   ├── Dockerfile.words      # Dockerfile для Words
 │   └── Dockerfile.yolo       # Dockerfile для Yolo
 ├── tests/                    # Интеграционные тесты
-├── docker-compose.yaml       # Оркестрация всех сервисов
+├── compose.yaml              # Оркестрация всех сервисов
 ├── Makefile                  # Автоматизация команд
 ├── animation.mp4             # Видео-демонстрация
 └── README.md                 # Документация
