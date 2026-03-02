@@ -10,8 +10,7 @@
 
 ##  Демонстрация работы
 
-<video src="animation.mp4" controls width="800"></video>
-
+<video src="https://raw.githubusercontent.com/Kseniiiiia/GoLang-Yadro-course/main/animation.mp4" controls width="800"></video>
 *Краткое видео, показывающее поиск комиксов с помощью загруженного изображения*
 
 ---
